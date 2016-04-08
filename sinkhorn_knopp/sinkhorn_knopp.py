@@ -1,6 +1,4 @@
 import warnings
-from types import IntType, FloatType
-
 import numpy as np
 
 
@@ -71,15 +69,15 @@ class SinkhornKnopp:
     """
 
     def __init__(self, max_iter=1000, epsilon=1e-3):
-        assert type(max_iter) is IntType or\
-            type(max_iter) is FloatType,\
+        assert type(max_iter) is int or\
+            type(max_iter) is float,\
             "max_iter is not of type int or float: %r" % max_iter
         assert max_iter > 0,\
             "max_iter must be greater than 0: %r" % max_iter
         self._max_iter = int(max_iter)
 
-        assert type(epsilon) is FloatType or\
-            type(epsilon) is IntType,\
+        assert type(epsilon) is float or\
+            type(epsilon) is int,\
             "epsilon is not of type float or int: %r" % epsilon
         assert epsilon > 0 and epsilon < 1,\
             "epsilon must be between 0 and 1 exclusive: %r" % epsilon
