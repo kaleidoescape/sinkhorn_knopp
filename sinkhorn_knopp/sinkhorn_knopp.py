@@ -165,7 +165,7 @@ class SinkhornKnopp:
         pdotr = P.T.dot(r)
         if not np.all(pdotr != 0):
             warnings.warn(
-                "Matrix doesn't have total support: some row is 0", 
+                "Matrix doesn't have total support: some col is 0", 
                  UserWarning
             )
             return False
@@ -174,7 +174,7 @@ class SinkhornKnopp:
         pdotr = P.dot(r)
         if not np.all(pdotr != 0):
             warnings.warn(
-                "Matrix doesn't have total support: some col is 0", 
+                "Matrix doesn't have total support: some row is 0", 
                  UserWarning
             )
             return False

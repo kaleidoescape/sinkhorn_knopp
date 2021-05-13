@@ -1,7 +1,9 @@
 sinkhorn_knopp
 --------
 
-To convert non-negative square matrices with total support into doubly stochastic matrices. 
+Convert non-negative square matrices with total support into doubly stochastic matrices. 
+
+Note: This fork differs in that it makes a few extra checks for total support that were missing in the original to inform the user of likely problems.
 
 ```python
     >> import numpy as np
@@ -22,32 +24,14 @@ See http://msp.org/pjm/1967/21-2/pjm-v21-n2-p14-s.pdf for reference.
 
 ## Install
 
-Either:
-
 ```sh
-pip install sinkhorn_knopp
-```
-
-or
-
-```sh
-git clone https://github.com/btaba/sinkhorn_knopp
+git clone https://github.com/kaleidoescape/sinkhorn_knopp
 cd sinkhorn_knopp
-python setup.py install
+pip install -e .
 ```
 
 ## Uninstall
 
-Depending on the above, either:
-
 ```sh
 pip uninstall sinkhorn_knopp
-```
-
-or 
-
-```sh
-cd sinkhorn_knopp
-python setup.py install --record files.txt
-cat files.txt | xargs rm -rf
 ```
