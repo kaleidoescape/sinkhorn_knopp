@@ -54,6 +54,54 @@ class TestSinkhornKnopp(unittest.TestCase):
             sk.fit(P)
             self.assertEqual(w[0].category, UserWarning)
 
+    def test_has_support_false_zero_row(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            sk = SinkhornKnopp()
+            P = np.asarray([[1,0,0,0], [0,1,0,0], [0,0,1,0], [0,0,0,0]])
+            self.assertFalse(sk.has_support(P))
+            self.assertEqual(w[0].category, UserWarning)
+
+    def test_has_support_false_zero_col(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            sk = SinkhornKnopp()
+            P = np.asarray([[1,0,0,0], [0,1,0,0], [0,0,1,0], [0,0,0,0]]).T
+            self.assertFalse(sk.has_support(P))
+            self.assertEqual(w[0].category, UserWarning)
+
+    def test_has_support_false_same_zeros_col(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            sk = SinkhornKnopp()
+            P = np.asarray([[1,1,0,1], [1,0,0,0], [0,0,1,0], [1,0,1,0]])
+            self.assertFalse(sk.has_support(P))
+            self.assertEqual(w[0].category, UserWarning)
+
+    def test_has_support_false_same_zeros_row(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            sk = SinkhornKnopp()
+            P = np.asarray([[1,1,0,1], [1,0,0,0], [0,0,1,0], [1,0,1,0]])
+            self.assertFalse(sk.has_support(P))
+            self.assertEqual(w[0].category, UserWarning)
+
+    def test_has_support_false_t_shape_sideways(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            sk = SinkhornKnopp()
+            P = np.asarray([[1,1,1,1], [0,0,1,0], [0,0,1,0], [0,0,1,0]])
+            self.assertFalse(sk.has_support(P))
+            self.assertEqual(w[0].category, UserWarning)
+
+    def test_has_support_false_t_shape_sideways(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            sk = SinkhornKnopp()
+            P = np.asarray([[1,0,0,0], [1,0,0,0], [1,1,1,1], [1,0,0,0]])
+            self.assertFalse(sk.has_support(P))
+            self.assertEqual(w[0].category, UserWarning)
+
     def test_sinkhorn_knopp(self):
         # Epsilon = 1e-3
         sk = SinkhornKnopp()
@@ -97,3 +145,6 @@ class TestSinkhornKnopp(unittest.TestCase):
         self.assertEqual(sk._D2.ndim, 2)
         self.assertTrue(np.all(sk._D1 == P))
         self.assertTrue(np.all(sk._D2 == P))
+
+if __name__ == '__main__':
+    unittest.main()

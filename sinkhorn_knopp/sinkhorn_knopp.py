@@ -1,4 +1,5 @@
 import warnings
+
 import numpy as np
 
 
@@ -69,15 +70,13 @@ class SinkhornKnopp:
     """
 
     def __init__(self, max_iter=1000, epsilon=1e-3):
-        assert type(max_iter) is int or\
-            type(max_iter) is float,\
+        assert isinstance(max_iter, int) or isinstance(max_iter, float),\
             "max_iter is not of type int or float: %r" % max_iter
         assert max_iter > 0,\
             "max_iter must be greater than 0: %r" % max_iter
         self._max_iter = int(max_iter)
 
-        assert type(epsilon) is float or\
-            type(epsilon) is int,\
+        assert isinstance(epsilon, int) or isinstance(epsilon, float),\
             "epsilon is not of type float or int: %r" % epsilon
         assert epsilon > 0 and epsilon < 1,\
             "epsilon must be between 0 and 1 exclusive: %r" % epsilon
@@ -108,26 +107,18 @@ class SinkhornKnopp:
         assert np.all(P >= 0)
         assert P.ndim == 2
         assert P.shape[0] == P.shape[1]
+        self.has_support(P) #print warnings about total support
 
         N = P.shape[0]
         max_thresh = 1 + self._epsilon
         min_thresh = 1 - self._epsilon
 
         # Initialize r and c, the diagonals of D1 and D2
-        # and warn if the matrix does not have support.
         r = np.ones((N, 1))
         pdotr = P.T.dot(r)
-        total_support_warning_str = (
-            "Matrix P must have total support. "
-            "See documentation"
-        )
-        if not np.all(pdotr != 0):
-            warnings.warn(total_support_warning_str, UserWarning)
 
         c = 1 / pdotr
         pdotc = P.dot(c)
-        if not np.all(pdotc != 0):
-            warnings.warn(total_support_warning_str, UserWarning)
 
         r = 1 / pdotc
         del pdotr, pdotc
@@ -159,3 +150,64 @@ class SinkhornKnopp:
         P_eps = self._D1.dot(P).dot(self._D2)
 
         return P_eps
+
+    def has_support(self, P):
+        """
+            A non-negative square is said to have total
+            support if A =/= 0 and if every positive element of A
+            lies on a positive diagonal. A diagonal of a matrix
+            is defined, for any permutation of sigma = {1,...,N},
+            as a[1,sigma(1)], ..., a[N,sigma(N)], where a[i, j]
+            is an element of A at the ith row and jth column.
+        """
+        #no support: some row is all zero
+        r = np.ones((P.shape[0], 1))
+        pdotr = P.T.dot(r)
+        if not np.all(pdotr != 0):
+            warnings.warn(
+                "Matrix doesn't have total support: some row is 0", 
+                 UserWarning
+            )
+            return False
+        #no support: some col is all zero
+        r = np.ones((P.shape[0], 1))
+        pdotr = P.dot(r)
+        if not np.all(pdotr != 0):
+            warnings.warn(
+                "Matrix doesn't have total support: some col is 0", 
+                 UserWarning
+            )
+            return False
+
+        #no support: two rows have 0s everywhere except in the same 
+        #spot as one another, meaning we can't permute to a diagonal
+        mask = np.ma.masked_where(P != 0, P).mask
+        row_singles = np.where(np.sum(mask, axis=1) == 1)
+        sliced_mask = mask[row_singles]
+        cols = np.where(sliced_mask == True)[1]
+        s = np.sort(cols, axis=None) #https://stackoverflow.com/q/11528078
+        duplicates = s[:-1][s[1:] == s[:-1]]
+        if len(duplicates) != 0:
+            warnings.warn(
+                "Matrix doesn't have total support: two rows are nonzero in only one shared col", 
+                 UserWarning
+            )
+            return False 
+        #no support: two rows have 0s everywhere except in the same 
+        #spot as one another, meaning we can't permute to a diagonal
+        mask = np.ma.masked_where(P.T != 0, P.T).mask
+        row_singles = np.where(np.sum(mask, axis=1) == 1)
+        sliced_mask = mask[row_singles]
+        cols = np.where(sliced_mask == True)[1]
+        s = np.sort(cols, axis=None) #https://stackoverflow.com/q/11528078
+        duplicates = s[:-1][s[1:] == s[:-1]]
+        if len(duplicates) != 0:
+            warnings.warn(
+                "Matrix doesn't have total support: two cols are nonzero in only one shared row", 
+                 UserWarning
+            )
+            return False
+
+        return True
+
+ 
